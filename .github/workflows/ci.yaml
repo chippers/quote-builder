@@ -18,7 +18,7 @@ env:
 
 jobs:
   rust:
-    name: Rust
+    name: rust
     runs-on: ubuntu-latest
     env:
       CC: deny_c
