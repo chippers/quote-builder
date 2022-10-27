@@ -1,0 +1,15 @@
+[package]
+name = "quote-builder"
+version = "0.1.0"
+authors = ["Chip Reed <chip@chip.sh>"]
+edition = "2018"
+license = "Apache-2.0 or MIT"
+
+[features]
+default = []
+macros = ["quote-builder-macros"]
+
+[dependencies]
+quote = "1"
+quote-builder-impl = { path = "../quote-builder-impl", version = "0.1" }
+quote-builder-macros = { path = "../quote-builder-macros", version = "0.1", optional = true }
