@@ -1,54 +1,45 @@
 name: ci
 on:
   push:
-    branches:
-      - main
   pull_request:
-    paths:
-      - "crates/**"
+
+permissions:
+  contents: read
 
 env:
-  CARGO_INCREMENTAL: 0
-  CARGO_NET_RETRY: 10
-  CI: 1
-  RUST_BACKTRACE: short
-  RUSTFLAGS: "-D warnings -W unreachable-pub"
-  RUSTUP_MAX_RETRIES: 10
-
+  RUSTFLAGS: -Dwarnings
 
 jobs:
-  rust:
-    name: rust
+  test:
+    name: rust ${{matrix.rust}}
     runs-on: ubuntu-latest
-    env:
-      CC: deny_c
-
     strategy:
       fail-fast: false
-
+      matrix:
+        rust: [nightly, beta, stable, 1.56]
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.rust}}
+      - run: cargo test --all-features --all-targets
 
-    - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        profile: minimal
-        override: true
-        components: rustfmt, clippy
+  clippy:
+    name: clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.56
+        with:
+          components: clippy
+      - run: cargo clippy --all-targets -- -Dclippy::all -Dclippy::pedantic
 
-    - name: Cache Dependencies
-      uses: Swatinem/rust-cache@ce325b60658c1b38465c06cc965b79baf32c1e72
-
-    - name: Formatting
-      run: cargo fmt --all -- --check
-
-    - name: Compile
-      run: cargo test --no-run
-      
-    - name: Clippy
-      run: cargo clippy
-
-    - name: Test
-      run: cargo test -- --nocapture --quiet
+  fmt:
+    name: fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.56
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- -Dclippy::all -Dclippy::pedantic
