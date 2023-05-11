@@ -42,4 +42,4 @@ jobs:
       - uses: dtolnay/rust-toolchain@1.56
         with:
           components: rustfmt
-      - run: cargo fmt --all -- -Dclippy::all -Dclippy::pedantic
+      - run: cargo fmt --all -- --check
